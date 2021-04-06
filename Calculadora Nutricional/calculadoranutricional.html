@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=scr, initial-scale=1.0">
+    <title>CALCULADORA NUTRICIONAL</title>
+</head>
+
+<body>
+    <h1>
+        <center>CALCULADORA NUTRICIONAL</center>
+    </h1>
+    <h4>
+        <center>IMC, GEB, GET, ESTIMATIVA DE TEMPO PARA EMAGRECIMENTO</center>
+    </h4>
+
+    <script>
+
+        //EXERCÍCIO 4:
+
+        /* 
+            Crie um sistema que receba as informações necessárias do usuário como: 
+            nome, idade, peso, altura, sexo e quantidade de peso em Kg que deseja perder , e ese ela pratica 
+            atividades físicas. 
+            O sistema deve calcular todos os fatores e mostrar para o usuário informações importantes como IMC, GEB e 
+            GET, quantidade de calorias ideal por dia e quanto tempo ele levaria para perder a quantidade de peso
+            que informou.
+        */
+
+        //PLANEJAMENTO:
+
+        /*
+            -> Receber : nome , idade , peso, altura , sexo , quantidade de peso em Kg que deseja perder. OK          
+            -> IMC  - peso / altura * altura. OK
+            -> GEB  - Feminino	(10 x P) + (6,25 x A) – (5,0 x I) – 161. OK
+                    - Masculino	(10 x P) + (6,25 x A) – (5,0 x I) + 5. OK 
+            -> GET  - Sedentário = GEB * 1,2 / Leve = GEB * 1,375 / Moderado = GEB * 1,55 / Pesadp = GEB * 1,725. OK 
+            -> Quantidade de calorias ideal por dia = GET - 20%. OK 
+            -> Quanto tempo ele levaria para perder a quantidade de peso que informou. OK 
+        */
+
+
+        //INPUT:
+        var nome = prompt('Informe o seu nome, por favor:');
+        var idade = validadorNumero('Informe a sua idade:');
+        var peso = validadorNumero('Informe o seu peso, em Kg:');
+        var altura = validadorNumero('Agora informe a sua altura, em metros:');
+        var sexo = validadorString('Informe o seu sexo: Masculino ou Feminino');
+        var kgPerder = validadorNumero('Informe qual a quantidade de peso, em Kg, que deseja perder:');
+        var nvlAF = validadorAtiv(`${nome}, informe, por fim, em qual nível de prática de atividade física você se encaixa, considerando: 
+                    1 - Sedentário ; 2 - Leve ; 3 - Moderado ; 4 -Intenso`);
+        var imc = calcularImc(peso, altura);
+        var classif = obterClassificacao(imc);
+        var geb = calcularGeb(sexo, peso, altura, idade);
+        var get = calcularGet(geb, nvlAF);
+        var caloriasIdeal = calcularCalorias(get);
+        var diasParaEmagrecer = contarDias(kgPerder, get, caloriasIdeal);
+
+        //FUNCÕES:
+        function validadorNumero(mensagem) {
+            var x = parseFloat(prompt(mensagem));
+            if (isNaN(x)) {
+                alert('Você informou um dado inválido!');
+                return validadorNumero(mensagem);
+            } else {
+                return x;
+            }
+        }
+        function validadorString(mensagem) {
+            var y = prompt(mensagem).toLocaleLowerCase();
+            if (y != 'masculino' && y != 'feminino') {
+                alert('Você informou um dado inválido!');
+                return validadorString(mensagem);
+            } else {
+                return y;
+            }
+        }
+        function validadorAtiv(mensagem) {
+            var z = parseInt(prompt(mensagem));
+            if (z != 1 && z != 2 && z != 3 && z != 4) {
+                alert('Você informou um dado inválido!');
+                return validadorAtiv(mensagem);
+            } else {
+                return z;
+            }
+        }
+
+        function calcularImc(peso, altura) {
+            return peso / (altura * altura);
+        }
+
+        function obterClassificacao(imc) {
+
+            if (imc <= 18.5) {
+                return 'Abaixo do Peso';
+
+            } else if (imc <= 24.9) {
+                return 'Peso Normal';
+
+            } else if (imc <= 29.9) {
+                return 'Sobrepeso';
+
+            } else if (imc <= 34.9) {
+                return 'Obesidade Grau 1';
+
+            } else if (imc <= 39.9) {
+                return 'Obesidade Grau 2';
+
+            } else {
+                return 'Obesidade Grau 3';
+            }
+
+        }
+        function calcularGeb(sexo, peso, altura, idade) {
+            if (sexo == 'masculino') {
+                return (10 * peso) + (6.25 * (altura * 100)) - (5 * idade) + 5;
+            } else if (sexo == 'feminino') {
+                return (10 * peso) + (6.25 * (altura * 100)) - (5 * idade) - 161;
+            }
+        }
+        function calcularGet(geb, nvlAF) {
+            if (nvlAF == 1) {
+                return geb * 1.2;
+            } else if (nvlAF == 2) {
+                return geb * 1.375;
+            } else if (nvlAF == 3) {
+                return geb * 1.55;
+            } else if (nvlAF == 4) {
+                return geb * 1.725;
+            }
+        }
+
+        function calcularCalorias(get) {
+            return get * 0.8;
+        }
+
+        function contarDias(kgPerder, get, caloriasIdeal) {
+            return ((kgPerder * 7700) / (get - caloriasIdeal)).toFixed(0);
+        }
+
+        //OUTPUT:
+
+        document.write(`<strong>Nome:</strong> ${nome.toUpperCase()}<br>`);
+        document.write(`<strong>Peso:</strong> ${peso} Kg<br>`);
+        document.write(`<strong>Altura:</strong> ${altura} m<br>`);
+        document.write(`<strong>Idade:</strong> ${idade} anos<br>`);
+        document.write(`<strong>Sexo:</strong> ${sexo.toUpperCase()}<br><br>`);
+        document.write(`Seu <strong>IMC</strong> (Índice de Massa Corporal) é ${imc.toFixed(2)} Kg/m². <br>`);
+        document.write(`<strong>Classificação</strong>: ${classif}<br>`);
+        document.write(`Seu <strong>GEB</strong> (Gasto Energético Basal) é ${geb.toFixed(2)} calorias por dia. <br>`);
+        document.write(`Seu <strong>GET</strong> (Gasto Energético Total) é ${get.toFixed(2)} calorias por dia. <br><br>`);
+        document.write(`A quantidade ideal de calorias a ser consumida é de ${caloriasIdeal.toFixed(0)} calorias por dia.<br>`);
+        document.write(`O tempo necessário para emagrecer ${kgPerder}kg será de ${diasParaEmagrecer} dias.`);
+
+    </script>
+</body>
+
+</html>
